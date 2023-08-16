@@ -1,0 +1,19 @@
+<link rel="stylesheet" href="css/style.css" />
+<div class="login-page">
+  <div class="form">
+    <form class="register-form" action="" method="POST" enctype="multipart/form-data" style="display: block;">
+      <input type="text" name="name" placeholder="Enter your name" required>
+      <input type="email" name="email" placeholder="Enter email" required>
+      <input type="file" name="image" required>
+      <input type="password" name="password" maxlength="8" placeholder="Enter your password" required>
+      <button type="submit">create</button>
+      <p class="message">Already registered? <a href="/"> Sign In</a></p>
+    </form>
+    <% if(typeof registerMessage !=='undefined' ){ if(success===false){ %>
+      <p style="color: red;"> <%- registerMessage %></p>
+      <% } else { %>
+        <p style="color: green;"><%- registerMessage %></p>
+        <% } } %>
+  </div>
+
+</div>

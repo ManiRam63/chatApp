@@ -1,0 +1,14 @@
+<link rel="stylesheet" href="css/style.css" />
+<div class="login-page">
+  <div class="form">
+    <form class="login-form" action="" method="POST" autocomplete="on">
+      <input type="email" name="email" placeholder="Enter your email" autocomplete="off" required />
+      <input type="password" name="password" placeholder="Password" required autocomplete="off" />
+      <button type="submit">login</button>
+      <p class="message">Not registered? <a href="/register">Create an account</a></p>
+    </form>
+    <% if(typeof message !=='undefined' ){ %>
+      <p style="color: red;"><%- message %></p>
+      <% } %>
+  </div>
+</div>

@@ -1,0 +1,92 @@
+<%- include('layout/header.ejs') %>
+    <section class="home-section">
+        <nav>
+            <div class="sidebar-button">
+
+            </div>
+            <div class="search-box">
+
+            </div>
+
+        </nav>
+        <div class="home-content">
+            <div class="overview-boxes">
+                <div class="box" style="margin-left: 0px;margin-top: -6px;">
+                    <div class="right-side">
+                        <div class="box-topic">Total Users : <%- users.length %></div>
+                        <ul class="list-group">
+                            <% if(users.length> 0){
+                                for(let i=0; i< users.length; i++){ let userStatus=users[i]['is_online']; %>
+                                    <li class="list-group-items user-list"
+                                        style="list-style-type: none;cursor: pointer;" data-id="<%= users[i]['_id'] %>">
+                                        <% if( users[i]['image']) { %>
+                                            <img src="<%- users[i]['image'] %> "
+                                                style="width: 25px;height: 25px; cursor: pointer;border-radius: 3px;border: 1px;"
+                                                alt="" />
+                                            <% } %>
+                                                <span><%- users[i]['name'] %></span>
+                                                <% if(userStatus==1){ %>
+                                                    <span class="online-status"
+                                                        id="<%- users[i]['_id']%>-status">Online</span>
+                                                    <% } else { %>
+                                                        <span class=" offline-status"
+                                                            id="<%- users[i]['_id']%>-status">Offline</span>
+                                                        <% } %>
+                                    </li>
+
+                                    <% } } %>
+                        </ul>
+                    </div>
+                </div>
+                <div class="">
+                    <div class="right-side">
+                        <h3 class="start-head"> Click to start the chat </h3>
+                        <div class="chat-section" style="display: none;">
+                            <div id="chat-container"
+                                style="background-color: lightblue; width: 100%; height: 400px; overflow: scroll;border: 1px;">
+                                <div class="current-user-chat">
+
+                                </div>
+                                <div class="other-user-chat">
+
+                                </div>
+                            </div>
+                            <form action="" id="chat-form">
+                                <input type="text" name="message" placeholder="Enter Message" id="message" required
+                                    style="width:68%;border: 2px; height:36px" />
+                                <input type="submit" value="send-message"
+                                    style="background-color: green;color: white; height: 37px;">
+                            </form>
+                        </div>
+
+                    </div>
+                </div>
+                <script>
+                    $("#chat-form").submit(function (event) {
+                        event.preventDefault();
+                        const msgValue = $("#message").val();
+                        if (msgValue) {
+                            $.ajax({
+                                url: "/save-chat",
+                                type: "post",
+                                data: {
+                                    senderId: senderId,
+                                    recieverId: receiverId,
+                                    message: msgValue,
+                                },
+                                success: function (res) {
+                                    if (res?.success) {
+                                        $("#message").val("");
+                                        let msg = res?.data?.message;
+                                        let html = `<div class="current-user-chat"><h5>${msg} </h5></div>`;
+                                        $("#chat-container").append(html);
+                                        socket.emit("newChat", res?.data);
+                                    } else {
+                                        alert(res?.msg);
+                                    }
+                                },
+                            });
+                        }
+                    });
+                </script>
+                <%- include('layout/footer.ejs') %>
