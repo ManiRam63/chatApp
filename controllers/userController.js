@@ -1,41 +1,36 @@
 const User = require("../models/userModels");
-const Chat = require("../models/chatModel");
 const UserStore = require("../store/userStore");
 const ChatStore = require("../store/chatStore");
-const GroupStore = require("../store/groupStore");
 const bcrypt = require("bcrypt");
-const { json } = require("body-parser");
-const { constants } = require("fs/promises");
 
+/**
+ *
+ * @param {*} req
+ * @param {*} res
+ * @description:this function is used to load register page
+ */
 const registerLoad = async (req, res) => {
   try {
     res.render("register");
   } catch (error) {
-    console.log(error.message);
+    res.status(400).send({ success: false, message: error.message });
   }
 };
 /**
  * @param {} req
- * @param {} res
  * @description:this function is used to register user
  * @returns {message}
  */
 const register = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { email } = req.body;
     const isExit = await UserStore.findUserByEmail(email);
     if (isExit) {
       throw new Error("Email is already exist");
     }
-    const hashPassword = await bcrypt.hash(password, 10);
-    const user = new User({
-      name: name,
-      email: email,
-      image: "/images/" + req.file.filename,
-      password: hashPassword,
-    });
-    await user.save();
-    res.redirect("/login");
+
+    await UserStore.createUser(req.body, req.file.filename);
+    res.redirect("/");
   } catch (error) {
     res
       .status(400)
@@ -44,7 +39,6 @@ const register = async (req, res) => {
 };
 /**
  * @param {} req
- * @param {} res
  * @description:this function is used load login page
  * @returns {message}
  */
@@ -52,13 +46,12 @@ const loadLogin = async (req, res) => {
   try {
     res.render("login");
   } catch (error) {
-    console.log(error.message);
+    res.status(400).send({ success: false, message: error.message });
   }
 };
 
 /**
  * @param {} req
- * @param {} res
  * @description:this function is used  login user
  */
 const login = async (req, res) => {
@@ -86,7 +79,6 @@ const login = async (req, res) => {
   }
 };
 /**
- * @param {} req
  * @param {} res
  * @description:this function is used  logout the user
  */
@@ -96,11 +88,10 @@ const logout = async (req, res) => {
     req.session.destroy();
     res.redirect("/");
   } catch (error) {
-    console.log(error.message);
+    res.status(400).send({ success: false, message: error.message });
   }
 };
-/**
- * @param {} req
+/**s
  * @param {} res
  * @description:this function is used  login user
  */
@@ -110,23 +101,16 @@ const dashboard = async (req, res) => {
     const users = await UserStore.getUsers(_id);
     res.render("dashboard", { user: req.session.user, users: users });
   } catch (error) {
-    console.log(error.message);
+    res.status(400).send({ success: false, message: error.message });
   }
 };
 /**
- * @param {} req
  * @param {} res
  * @description:this function is used to save chat in db
  */
 const saveChat = async (req, res) => {
   try {
-    const { senderId, recieverId, message } = req.body;
-    const chat = new Chat({
-      receiver_id: recieverId,
-      sender_id: senderId,
-      message: message,
-    });
-    const result = await chat.save();
+    const result = await ChatStore.saveChat(req.body);
     res
       .status(201)
       .send({ success: true, msg: "chat saved successfully", data: result });
@@ -147,46 +131,46 @@ const deleteChat = async (req, res) => {
     res.status(400).send({ success: false, msg: error.message });
   }
 };
+//TODO:we can use this later if group chat will enable
+// /**
+//  * @param { id }
+//  * @description:this function is used to delete chat from db
+//  */
+// const loadGroup = async (req, res) => {
+//   try {
+//     const { _id } = req.session.user;
+//     const groups = await GroupStore.getGroups(_id);
+//     res.render("group", { groups: groups });
+//   } catch (error) {
+//     res.status(400).send({ success: false, msg: error.message });
+//   }
+// };
+// /**
+//  * @param { id }
+//  * @description:this function is used to delete chat from db
+//  */
+// const CreateGroup = async (req, res) => {
+//   try {
+//     const { limit, groupName } = req.body;
 
-/**
- * @param { id }
- * @description:this function is used to delete chat from db
- */
-const loadGroup = async (req, res) => {
-  try {
-    const { _id } = req.session.user;
-    const groups = await GroupStore.getGroups(_id);
-    res.render("group", { groups: groups });
-  } catch (error) {
-    res.status(400).send({ success: false, msg: error.message });
-  }
-};
-/**
- * @param { id }
- * @description:this function is used to delete chat from db
- */
-const CreateGroup = async (req, res) => {
-  try {
-    const { limit, groupName } = req.body;
+//     await GroupStore.createGroup({
+//       creator_id: req.session.user._id,
+//       limit: limit,
+//       name: groupName,
+//       image: "/images/" + req.file.filename,
+//     });
 
-    await GroupStore.createGroup({
-      creator_id: req.session.user._id,
-      limit: limit,
-      name: groupName,
-      image: "/images/" + req.file.filename,
-    });
+//     const groups = await GroupStore.getGroups(req.session.user._id);
 
-    const groups = await GroupStore.getGroups(req.session.user._id);
-
-    res.status(201).render("group", {
-      success: true,
-      message: "Group Created successfully!",
-      groups: groups,
-    });
-  } catch (error) {
-    res.status(400).send({ success: false, msg: error.message });
-  }
-};
+//     res.status(201).render("group", {
+//       success: true,
+//       message: "Group Created successfully!",
+//       groups: groups,
+//     });
+//   } catch (error) {
+//     res.status(400).send({ success: false, msg: error.message });
+//   }
+// };
 module.exports = {
   registerLoad,
   register,
@@ -196,6 +180,6 @@ module.exports = {
   logout,
   saveChat,
   deleteChat,
-  loadGroup,
-  CreateGroup,
+  // loadGroup,
+  // CreateGroup,
 };

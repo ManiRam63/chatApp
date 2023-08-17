@@ -20,7 +20,6 @@ userRoute.set("views", "./views");
 userRoute.use(express.static("public"));
 userRoute.use(cookieParser());
 //image storage defined
-
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     const dir = path.resolve(path.join(__dirname, "../public/images"));
@@ -44,14 +43,15 @@ userRoute.get("/logout", isLogin, userController.logout);
 userRoute.get("/dashboard", userController.dashboard);
 userRoute.post("/save-chat", isLogin, userController.saveChat);
 userRoute.delete("/delete-chat", isLogin, userController.deleteChat);
+//TODO:we can use this routes later for group chat
 // groups routes
-userRoute.get("/group", isLogin, userController.loadGroup);
-userRoute.post(
-  "/group",
-  isLogin,
-  upload.single("image"),
-  userController.CreateGroup
-);
+// userRoute.get("/group", isLogin, userController.loadGroup);
+// userRoute.post(
+//   "/group",
+//   isLogin,
+//   upload.single("image"),
+//   userController.CreateGroup
+// );
 // userRoute.get("*", function (req, res) {
 //   res.redirect("/");
 // });
