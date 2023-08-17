@@ -9,7 +9,7 @@
       <button type="submit">create</button>
       <p class="message">Already registered? <a href="/"> Sign In</a></p>
     </form>
-    <% if(typeof registerMessage !=='undefined' ){ if(success===false){ %>
+    <% if(typeof registerMessage !=='undefined' ){ if(success==false){ %>
       <p style="color: red;"> <%- registerMessage %></p>
       <% } else { %>
         <p style="color: green;"><%- registerMessage %></p>

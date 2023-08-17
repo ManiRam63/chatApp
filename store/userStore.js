@@ -1,5 +1,5 @@
 const User = require("../models/userModels");
-
+const bcrypt = require("bcrypt");
 /**
  * @param : id
  * @description : this function is used to get user
