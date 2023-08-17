@@ -21,9 +21,7 @@ io.on("connection", (socketStr) => {
   socketStr.on("chat message", (msg) => {
     io.emit("chat message", msg);
   });
-  socketStr.on("disconnect", () => {
-    // console.log("user disconnected");
-  });
+  socketStr.on("disconnect", (data) => {});
 });
 nameSpace.on("connection", async function (socket) {
   const userId = socket?.handshake?.auth?.token;
